@@ -27,7 +27,7 @@ It would be great that some level of automation ensures that a minimum of two in
 
 You are the amazing cloud engineer that is going to sort this 😍
 
-## Instructions
+## Instructions
 
 The instructions for this one will be less prescriptive. Instead we'll provide some pointers to AWS services and tools that can help you on your journey
 
@@ -64,10 +64,11 @@ Do not worry at all about verbal mistakes or explaining things incorrectly then 
 6. Share the video with your coach as indicated
 
 
-
-
-
-
 ## Further reading
 
 [Snowflake servers](https://martinfowler.com/bliki/SnowflakeServer.html)
+
+[AWS Auto scaling group guide](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-asg-launch-template.html)
+
+[AWS Launch Template guide](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html)
+
