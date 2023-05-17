@@ -27,6 +27,12 @@ It would be great that some level of automation ensures that a minimum of two in
 
 You are the amazing cloud engineer that is going to sort this 😍
 
+## Pre-requisites
+
+- You have completed the [load balancing exercise](https://github.com/northcoders/ce-load-balancing-node-api)
+
+- You have completed the [AMI exercise](https://github.com/northcoders/ce-ami-image-creation)
+
 ## Instructions
 
 The instructions for this one will be less prescriptive. Instead we'll provide some pointers to AWS services and tools that can help you on your journey
@@ -36,6 +42,14 @@ The instructions for this one will be less prescriptive. Instead we'll provide s
 - To use an auto-scaling group you'll need a [launch template](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html)
 
 - To make use of the launch template, you'll need to have understood the concept of user data and running scripts when your instance starts. This was covered in the [Extension exercise](https://github.com/northcoders/ce-ami-image-creation#extension) of the AMI creation task. You can apply user data to launch templates.
+
+## Tearing things down
+
+1. Remove your auto scaling group
+
+2. Remove your load balancer
+
+3. Terminate any EC2 instances
 
 
 ## Submission process
@@ -63,6 +77,7 @@ Do not worry at all about verbal mistakes or explaining things incorrectly then 
 
 6. Share the video with your coach as indicated
 
+7. Complete the "Tearing things down" instructions
 
 ## Further reading
 
