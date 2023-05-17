@@ -10,7 +10,7 @@ You have made great progress on this utilising things like:
 
 * A load balancer that has health check capabilities. Not only will it balance load across different servers it also health checks the instance before sending traffic to it so without human intervention it will stop sending traffic to failing nodes
 
-* You want to avoid a scenario in which servers are configured correctly such as them having the wrong versions of node installed so you templated/automated this by creating an AMI image of your servers that ensures all servers have node and npm installed.
+* You want to avoid a scenario in which servers are configured incorrectly such as them having the wrong versions of node installed so you templated/automated this by creating an AMI image of your servers that ensures all servers have node and npm installed.
 
 
 🗒️ Side-Note: If you didn't have this level of consistency across your servers but instead you relied on humans to configure them and those humans could install different versions of node, or forget to intall certain tools then you might experience [Snowflake servers](https://martinfowler.com/bliki/SnowflakeServer.html)
