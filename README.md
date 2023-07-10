@@ -6,11 +6,7 @@ When utilising cloud technologies, we have to acknowledge that our responses to 
 
 So we need to re-think how we architect systems.
 
-You have made great progress on this utilising things like:
-
-- A load balancer that has health check capabilities. Not only will it balance load across different servers it also health checks the instance before sending traffic to it, so without human intervention it will stop sending traffic to failing nodes.
-
-- You want to avoid a scenario in which servers are configured incorrectly such as them having the wrong versions of node installed so you templated/automated this by creating an AMI image of your servers that ensures all servers have node and npm installed.
+You have made great progress on this utilising things like a load balancer that has health check capabilities. Not only will it balance load across different servers it also health checks the instance before sending traffic to it, so without human intervention it will stop sending traffic to failing nodes.
 
 🗒️ Side-Note: If you didn't have this level of consistency across your servers but instead you relied on humans to configure them and those humans could install different versions of node, or forget to intall certain tools then you might experience [Snowflake servers](https://martinfowler.com/bliki/SnowflakeServer.html)
 
@@ -18,9 +14,7 @@ There is another section that we can automate - can you guess what it is? Have a
 
 ## Scenario
 
-Even though you have used a template for your instances, the Amazon Machine image, you notice that you still have to manually provision the EC2 instance when you need one.
-
-Also, let's assume that we need a minimum of 2 instances to have a good service for our customers - what do you do if an instance fails? You have to first spot it and then manually launch another EC2 instance in its place.
+Let's assume that we need a minimum of 2 instances to have a good service for our customers - what do you do if an instance fails? You have to first spot it and then manually launch another EC2 instance in its place.
 
 It would be great that some level of automation ensures that a minimum of two instances are always running
 
@@ -34,7 +28,14 @@ The instructions for this one will be less prescriptive. Instead we'll provide s
 
 - To use an auto-scaling group you'll need a [launch template](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html)
 
-- To make use of the launch template, you'll need to have understood the concept of user data and running scripts when your instance starts. If you didn't get to the AMI Creation task from the Load Balancing Sprint, have a look at the [AMI Creation task](./ami-creation/README.md) first.
+- To make use of the launch template, you'll need to have a custom AMI ready (ideally with some user data scripts). Have a look at the [AMI Creation task](./ami-creation/README.md) first.
+
+Your final goal here is to end up with an Auto Scaling Group that will spin up new servers when needed;
+
+- Have your Auto Scaling Group run with a minimum of 2 of the exact same server.
+- Terminate one manually, if another one is created, and you can make a request to it, you've succeeded!
+- You should **not** have to SSH to your instance to start the server, it should be self sufficient.
+- See if you can set up a Load Balancer to split the incoming requests between your instances.
 
 ## Submission process
 
