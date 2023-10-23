@@ -1,8 +1,8 @@
 
 
 module "vpc" {
-    source = "./modules/networking"
-    public_subnet_cidrs = var.public_subnet_cidrs
-    private_subnet_cidrs = var.private_subnet_cidrs
-  
+  source          = "./modules/networking"
+  public_subnets  = var.public_subnets
+  private_subnets = var.private_subnets
+
 }
