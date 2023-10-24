@@ -1,3 +1,0 @@
-#!/bin/bash
-cd /home/ubuntu/ce-load-balancing-node-api/app
-pm2 start src/index.js
