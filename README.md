@@ -1,95 +1,104 @@
-# Launch templates and Auto scaling
+# Auto-scaling
 
-Up to this point, we have covered aspects on designing for failure.
+This Terraform code when applied will create;
 
-When utilising cloud technologies, we have to acknowledge that our responses to failure have to be re-thought. Such as us not being able to physically go and touch or restart the physical server. We may not even have direct phone call access to the people (EG. AWS employees) who look after our servers.
+- A VPC
+- 3 Public Subnets
+- 3 Private Subnets
+- Security rules which allow
+  - HTTP from anywhere
+  - HTTPS from anywhere
+  - All egress
+- An EC2 instance
 
-So we need to re-think how we architect systems.
+The `terraform.tfvars` file provided will supply some of these arguments and can be changed or updated if necessary.
 
-You have made great progress on this utilising things like a load balancer that has health check capabilities. Not only will it balance load across different servers it also health checks the instance before sending traffic to it, so without human intervention it will stop sending traffic to failing nodes.
+# NCore
 
-🗒️ Side-Note: If you didn't have this level of consistency across your servers but instead you relied on humans to configure them and those humans could install different versions of node, or forget to intall certain tools then you might experience [Snowflake servers](https://martinfowler.com/bliki/SnowflakeServer.html)
+# Auto-scaling
 
-There is another section that we can automate - can you guess what it is? Have a think about what you are still manually having to do before looking over the scenario
+When dealing with fluctuations in traffic, we often need more servers than we have ready. Rather than having someone sat waiting to add and remove servers based on demand, we can set up this behaviour programmatically using Auto-scaling Groups.
 
-## Scenario
+In this sprint, you will be given some infrastructure that you will need to convert to use Auto-scaling Groups.
 
-Let's assume that we need a minimum of 2 instances to have a good service for our customers - what do you do if an instance fails? You have to first spot it and then manually launch another EC2 instance in its place.
+This sprint is intended to be done entirely without using the AWS console.
 
-It would be great that some level of automation ensures that a minimum of two instances are always running
+Familiarise yourself with the Terraform code.
 
-You are the amazing cloud engineer that is going to solve this 😍
+This repo uses a `terraform.tfvars` file to supply variables to the root level code which are then passed down to each of the modules.
 
-## Instructions
+Once you're ready, provision the already provided infrastructure to your account.
 
-The instructions for this one will be less prescriptive. Instead we'll provide some pointers to AWS services and tools that can help you on your journey
+## 1. We can make it if we try
 
-- Take a look over [AWS Auto scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-asg-launch-template.html)
+It's time to set up our servers
 
-- To use an auto-scaling group you'll need a [launch template](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html)
+- Modify the security module to allow SSH connections from your IP address only. Your CIDR block should end in `/32`.
+- Modify your EC2 block to use a key pair for SSH authentication - this can be the name of one you've already created previously or you can [make a new one via the CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-keypairs.html).
 
-- To make use of the launch template, you'll need to have a custom AMI ready (ideally with some user data scripts). Have a look at the [AMI Creation task](./ami-creation/README.md) first.
+SSH to the instance using the following command as a template
 
-Your final goal here is to end up with an Auto Scaling Group that will spin up new servers when needed;
+**🗒️ Note: You'll need to be in the same directory as your key file.**
 
-- Have your Auto Scaling Group run with a minimum of 2 of the exact same server.
-- Terminate one manually, if another one is created, and you can make a request to it, you've succeeded!
-- You should **not** have to SSH to your instance to start the server, it should be self sufficient.
-- See if you can set up a Load Balancer to split the incoming requests between your instances.
+`ssh -i "KEY_NAME.pem" ubuntu@PUBLIC_DNS`
 
-## Submission process
+Once you have managed to connect to your instance, get the Learners API from yesterday up and running on the instance.
 
-Create a file in this repo called SOLUTIONS.md and answer the questions below;
+[Node API from load balancing sprint](https://github.com/northcoders/ce-load-balancing-node-api)
 
-1. What is the difference between a Launch Template and an AMI?
+Think about what packages you'll need to install to get this running.
 
-2. Give an example of a scenario where an auto scaler might add more instances
+## 2. I think i'm ready to go, AMI?
 
-3. Give an example of a scenario where an auto scaler might terminate instances
+Until now we have been using the standard Ubuntu Amazon Machine Image (AMI) and installing what we need each time.
 
-4. What are some advantages of using an auto scaler?
+However, we can actually create our own custom AMI with all of the files already installed that we might need. This means we don't have to constantly clone new repos, install Node and pm2 again, anytime we need another server.
 
-5. What kind of metrics might be monitored to trigger an auto scaler to change the amount of instances available?
+Create an AMI from the instance you just configured that contains all the packages you need.
 
-## Extension
+[aws_ami_from_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ami_from_instance)
 
-For this one you will be recording yourself on Zoom talking through what you have setup - 10 mins max
+## 3. Ready for Launch
 
-It's worth doing a short test run to test your Zoom and recording setup before committing to the final recording.
+An AMI will contain a snapshot of the operating system and files we want to install onto the EC2 instance whereas a `launch template` allows us to pre-define things such as; the instance type, the security groups, which key pair to use, whether the instance has a public DNS, etc.
 
-Do not worry at all about verbal mistakes or explaining things incorrectly then having to go back. Your presenting skills are not the focus right now 😊
+This will come in handy when we want to create instances programmatically later.
 
-1. Start up a zoom call that has only yourself in it
+Create a launch template that mirrors the properties of the EC2 resource block whilst using the new custom AMI you just created.
 
-2. Share your screen
+- [aws_launch_template](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template)
 
-3. Turn on recording on Zoom
+User Data allows us to run commands when the a new server starts up.
 
-4. Record a short video that includes
+Add some user data to your launch template, consider what commands you need to add to get a new server running.
 
-   - You talking through what you have setup so far on AWS and explaining back what those pieces do
-   - A demonstration of the auto scaling groups working
-     - You can demonstrate this by going to the EC2 section and manually terminating an instance then without clicking anything further (other than refresh) you should see your auto-scaling group kick into action and bring a new instance online
-     - You can also show that your API remains to be working even after terminating an instance
+You'll find an example of user-data in the file user-data-example.sh
 
-5. End the Zoom call and you will receive a message regarding your video being processed. Once complete it will save a video to your computer.
+## 4. It's time to expand
 
-6. Share the video with your coach as indicated
+Create an Autoscaling group (ASG) that makes use of the launch template you just created
 
-7. Complete the "Tearing things down" instructions
+- [aws_autoscaling_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group)
 
-## Tearing things down
+Add some variables to your `terraform.tfvars` and create the necessary blocks and links for your Autoscaling Group resource to use them.
 
-1. Remove your auto scaling group
+You should have variables that allow us to configure the ASG to control;
 
-2. Remove your load balancer
+- the minimum amount of instances
+- the desired amount of instances
+- the maximum amount of instances
 
-3. Terminate any EC2 instances
+## 5. It's all about balance
 
-## Further reading
+We can now spin up new servers as and when we need them but we don't want to have to send out a newsletter with the latest public DNS every time we get a new instance.
 
-[Snowflake servers](https://martinfowler.com/bliki/SnowflakeServer.html)
+Drawing on what you learned yesterday, create a load balancer that targets your Auto-scaling Group.
 
-[AWS Auto scaling group guide](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-asg-launch-template.html)
+- Create your Load Balancer
+- Attach it to the ASG [aws_autoscaling_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment)
 
-[AWS Launch Template guide](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html)
+## 6. Practice makes perfect
+
+Using what you've learned, get the [ce-smart-home](https://github.com/northcoders/ce-smart-home-status) services deployed with an ASG and Load balancer.
+
+You can use something like Insomnia, Postman, or ThunderClient to test out your services once hosted.
