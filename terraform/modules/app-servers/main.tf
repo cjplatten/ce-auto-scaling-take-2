@@ -16,12 +16,13 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical's ID - creators of the Ubuntu AMI
 }
 
-resource "aws_instance" "app-server" {
+resource "aws_instance" "app_server" {
 
-  instance_type   = var.instance_type
-  subnet_id       = var.public_subnets[0]
-  security_groups = var.security_group_names
-  ami             = data.aws_ami.ubuntu.id
+  instance_type               = var.instance_type
+  subnet_id                   = var.public_subnets[0]
+  vpc_security_group_ids      = var.security_group_ids
+  ami                         = data.aws_ami.ubuntu.id
+  associate_public_ip_address = true
 
 }
 

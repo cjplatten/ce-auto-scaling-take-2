@@ -13,8 +13,8 @@ module "security" {
 }
 
 module "app-servers" {
-  source               = "./modules/app-servers"
-  instance_type        = var.instance_type
-  security_group_names = module.security.security_group_names
-  public_subnets       = module.vpc.public_subnets
+  source             = "./modules/app-servers"
+  instance_type      = var.instance_type
+  security_group_ids = module.security.security_group_ids
+  public_subnets     = module.vpc.public_subnets_ids
 }
