@@ -38,13 +38,14 @@ resource "aws_ami_from_instance" "autoscale-ami" {
 
 resource "aws_launch_template" "autoscale_lt" {
   instance_type          = var.instance_type
-  vpc_security_group_ids = var.security_group_ids
   image_id               = data.aws_ami.ubuntu.id
   key_name               = "ProjectKeyPair"
+  # vpc_security_group_ids = var.security_group_ids
 
   network_interfaces {
     subnet_id                   = var.public_subnets[0]
     associate_public_ip_address = true
+    security_groups = var.security_group_ids
   }
 
   tags = {
@@ -52,4 +53,20 @@ resource "aws_launch_template" "autoscale_lt" {
   }
 
   user_data = filebase64("${path.module}/user_data.sh")
+}
+
+# You should have variables that allow us to configure the ASG to control:
+
+#     the minimum amount of instances
+#     the desired amount of instances
+#     the maximum amount of instances
+
+resource "aws_autoscaling_group" "asg" {
+  name             = "autoscaling_asg"
+  max_size         = var.as_max_size
+  min_size         = var.as_min_size
+  desired_capacity = var.as_desired_size
+  launch_template {
+    id = aws_launch_template.autoscale_lt.id
+  }
 }

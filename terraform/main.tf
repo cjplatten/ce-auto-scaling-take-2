@@ -17,4 +17,7 @@ module "app-servers" {
   instance_type      = var.instance_type
   security_group_ids = module.security.security_group_ids
   public_subnets     = module.vpc.public_subnets_ids
+  as_max_size        = var.as_max_size
+  as_min_size        = var.as_min_size
+  as_desired_size    = var.as_desired_size
 }
