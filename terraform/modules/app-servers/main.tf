@@ -17,15 +17,39 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "app_server" {
-
+  # count                       = 0
   instance_type               = var.instance_type
   subnet_id                   = var.public_subnets[0]
   vpc_security_group_ids      = var.security_group_ids
   ami                         = data.aws_ami.ubuntu.id
   associate_public_ip_address = true
+  key_name                    = "ProjectKeyPair"
+
+  tags = {
+    Name = "app_server_autoscale"
+  }
+}
+
+resource "aws_ami_from_instance" "autoscale-ami" {
+  name               = "autoscale-ami"
+  source_instance_id = aws_instance.app_server.id
 
 }
 
+resource "aws_launch_template" "autoscale_lt" {
+  instance_type          = var.instance_type
+  vpc_security_group_ids = var.security_group_ids
+  image_id               = data.aws_ami.ubuntu.id
+  key_name               = "ProjectKeyPair"
 
+  network_interfaces {
+    subnet_id                   = var.public_subnets[0]
+    associate_public_ip_address = true
+  }
 
+  tags = {
+    Name = "app_server_autoscale"
+  }
 
+  user_data = filebase64("${path.module}/user_data.sh")
+}
