@@ -21,3 +21,13 @@ module "app-servers" {
   as_min_size        = var.as_min_size
   as_desired_size    = var.as_desired_size
 }
+
+module "load_balancing" {
+  source                = "./modules/load_balancing"
+  vpc_id                = module.vpc.vpc_id
+  target_id             = module.app-servers.instance_ids
+  autoscaling_group_id  = module.app-servers.autoscaling_group_id
+  autoscaling_group_arn = module.app-servers.autoscaling_group_arn
+  security_group_ids    = module.security.security_group_ids
+  subnet_ids            = module.vpc.public_subnets_ids
+}
